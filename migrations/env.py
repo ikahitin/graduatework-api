@@ -8,7 +8,7 @@ from sqlalchemy import pool
 from alembic import context
 
 from app.db.session import Base
-from app.db.db_models.user import User
+from app.db.models.user import User
 
 load_dotenv(dotenv_path=os.getenv("DOTENV_PATH"))
 
