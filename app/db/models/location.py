@@ -11,4 +11,4 @@ class Location(Base):
     region = Column(String)
     image_url = Column(String)
     rating = Column(Float)
-    type = Column(String)
+    location_type = Column(String)

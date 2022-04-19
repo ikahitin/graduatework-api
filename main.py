@@ -1,11 +1,15 @@
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
+from starlette.staticfiles import StaticFiles
 
 from app.api.api import api_router
 
 app = FastAPI()
 
 app.include_router(api_router)
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
 
 origins = [
     "http://localhost",

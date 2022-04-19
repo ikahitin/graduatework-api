@@ -231,3 +231,11 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/git
+static/*
+!static/.gitkeep
+
+### macOS ###
+# General
+.DS_Store
+.AppleDouble
+.LSOverride
