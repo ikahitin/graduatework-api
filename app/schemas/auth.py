@@ -4,17 +4,15 @@ from pydantic.main import BaseModel
 from pydantic.networks import EmailStr
 
 
-class Token(BaseModel):
-    access_token: str
-    token_type: str
-
-
-class TokenData(BaseModel):
-    username: Optional[str] = None
+class UserLogin(BaseModel):
+    username: str
+    password: str
 
 
 class UserBase(BaseModel):
     email: EmailStr
+    first_name: Optional[str]
+    last_name: Optional[str]
 
 
 class UserCreate(UserBase):
@@ -26,3 +24,10 @@ class User(UserBase):
 
     class Config:
         orm_mode = True
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+    user: UserBase
+
