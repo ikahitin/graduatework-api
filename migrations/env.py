@@ -10,6 +10,8 @@ from alembic import context
 from app.db.session import Base
 from app.db.models.user import User
 from app.db.models.location import Location
+from app.db.models.apartment import Apartment
+
 
 load_dotenv(dotenv_path=os.getenv("DOTENV_PATH"))
 
