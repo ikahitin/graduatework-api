@@ -37,3 +37,7 @@ async def save_image(file: UploadFile, img_folder: str):
     async with aiofiles.open(os.path.join(img_dir, file_name), mode='wb') as f:
         await f.write(content)
     return file_name
+
+
+async def apartment_params(city: str, start: str, end: str, adults: int, children: int, rooms: int):
+    return {"city": city, "start": start, "end": end, "adults": adults, "children": children, "rooms": rooms}

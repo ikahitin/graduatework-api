@@ -11,8 +11,8 @@ router = APIRouter()
 
 
 @router.get("", response_model=List[Location])
-async def get_locations(db: Session = Depends(get_db), location_type: Optional[str] = None):
-    return crud.get_locations(db=db, location_type=location_type)
+async def get_locations(db: Session = Depends(get_db), order: str = "asc", location_type: Optional[str] = None):
+    return crud.get_locations(db=db, order=order, location_type=location_type)
 
 
 @router.post("", response_model=Location)

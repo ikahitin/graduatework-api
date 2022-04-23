@@ -1,8 +1,8 @@
 from fastapi.encoders import jsonable_encoder
-from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.core.security.auth import get_password_hash
+from app.db.models.apartment import Apartment
 from app.db.models.location import Location
 from app.db.models.user import User
 from app.schemas.auth import UserCreate
@@ -27,10 +27,15 @@ def create_location(db: Session, location: LocationCreate):
     return db_location
 
 
-def get_locations(db: Session, location_type: str = None):
+def get_locations(db: Session, order: str, location_type: str = None):
     query = db.query(Location)
+    if order == "desc":
+        query = db.query(Location).order_by(Location.id.desc())
     if location_type:
-        query = query.filter(Location.type == location_type)
+        query = query.filter(Location.location_type == location_type)
+    return query.order_by(Location.id).all()
+
+
+def get_apartments(db: Session, **kwargs):
+    query = db.query(Apartment).filter(Apartment.city == kwargs["city"])
     return query.all()
-
-
