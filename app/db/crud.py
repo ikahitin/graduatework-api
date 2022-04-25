@@ -1,6 +1,10 @@
+from typing import List
+
+from fastapi import UploadFile
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
+from app.api.utils import save_image
 from app.core.security.auth import get_password_hash
 from app.db.models.apartment import Apartment, ApartmentReservation
 from app.db.models.location import Location
@@ -44,3 +48,16 @@ def get_apartments(db: Session, **kwargs):
     available_apartments = db.query(Apartment).filter(Apartment.id.not_in(booked_apartments))
 
     return available_apartments.all()
+
+
+async def add_apartment_images(db: Session, images: List[UploadFile], apartment_id: int):
+    img_list = []
+    for img in images:
+        filename = await save_image(img, f"apartment/{apartment_id}")
+        img_list.append(filename)
+    apartment = db.query(Apartment).filter(Apartment.id == apartment_id).first()
+    apartment.images = img_list
+    db.add(apartment)
+    db.commit()
+    db.refresh(apartment)
+    return apartment

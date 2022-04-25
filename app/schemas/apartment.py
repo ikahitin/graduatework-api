@@ -1,9 +1,10 @@
 from enum import Enum
 from typing import Optional, List
 
-from pydantic import HttpUrl
+from pydantic import HttpUrl, validator
 from pydantic.main import BaseModel
 
+from app.core.config import BASE_URL
 from app.schemas.general import Coordinates
 
 
@@ -28,7 +29,6 @@ class ApartmentBase(BaseModel):
     coordinates: Coordinates
     city: str
     price: int
-    images: Optional[List[HttpUrl]]
     rating: float
     apartment_type: ApartmentTypeEnum
     amenities: List[str]
@@ -42,6 +42,15 @@ class ApartmentCreate(ApartmentBase):
 
 class Apartment(ApartmentBase):
     id: int
+    images: Optional[List[str]]
 
     class Config:
         orm_mode = True
+
+    @validator("images", pre=True, check_fields=False)
+    def validate_images_url(cls, v, values):
+        if v:
+            img_list = []
+            for img in v:
+                img_list.append(f"{BASE_URL}/static/apartment/{values['id']}/{img}")
+            return img_list
