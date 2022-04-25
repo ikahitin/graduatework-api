@@ -1,5 +1,6 @@
-from sqlalchemy import Column, Integer, String, Float
+from sqlalchemy import Column, Integer, String, Float, ForeignKey, Date, DateTime, func
 from sqlalchemy.dialects import postgresql as pg
+from sqlalchemy.orm import relationship
 
 from app.db.session import Base
 
@@ -21,3 +22,14 @@ class Apartment(Base):
     amenities = Column(pg.JSONB)
     distance_from_center = Column(Float)
     beds = Column(pg.JSONB)
+    reservations = relationship("ApartmentReservation")
+
+
+class ApartmentReservation(Base):
+    __tablename__ = "apartment_reservation"
+
+    id = Column(Integer, primary_key=True, index=True)
+    from_date = Column(Date)
+    to_date = Column(Date)
+    created_at = Column(DateTime(), default=func.current_timestamp(), nullable=False)
+    apartment_id = Column(Integer, ForeignKey('apartment.id'))
