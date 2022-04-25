@@ -35,3 +35,5 @@ uvloop==0.16.0
 watchgod==0.8.2
 websockets==10.2
 zipp==3.8.0
+
+aiofiles~=0.8.0

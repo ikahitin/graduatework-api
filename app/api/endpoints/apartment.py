@@ -13,4 +13,3 @@ router = APIRouter()
 @router.get("", response_model=List[Apartment])
 async def get_apartments(db: Session = Depends(get_db), apartment_details: dict = Depends(apartment_params)):
     return crud.get_apartments(db=db, **apartment_details)
-

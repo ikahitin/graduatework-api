@@ -2,7 +2,7 @@ from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
 from app.core.security.auth import get_password_hash
-from app.db.models.apartment import Apartment
+from app.db.models.apartment import Apartment, ApartmentReservation
 from app.db.models.location import Location
 from app.db.models.user import User
 from app.schemas.auth import UserCreate
@@ -37,5 +37,10 @@ def get_locations(db: Session, order: str, location_type: str = None):
 
 
 def get_apartments(db: Session, **kwargs):
-    query = db.query(Apartment).filter(Apartment.city == kwargs["city"])
-    return query.all()
+    booked_apartments = db.query(ApartmentReservation.apartment_id).filter(
+        (ApartmentReservation.from_date.between(kwargs["start"], kwargs["end"]) |
+         ApartmentReservation.to_date.between(kwargs["start"], kwargs["end"])))
+
+    available_apartments = db.query(Apartment).filter(Apartment.id.not_in(booked_apartments))
+
+    return available_apartments.all()

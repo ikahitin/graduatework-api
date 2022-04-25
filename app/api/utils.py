@@ -1,3 +1,4 @@
+import datetime
 import os
 import uuid
 
@@ -39,5 +40,5 @@ async def save_image(file: UploadFile, img_folder: str):
     return file_name
 
 
-async def apartment_params(city: str, start: str, end: str, adults: int, children: int, rooms: int):
+async def apartment_params(city: str, start: datetime.date, end: datetime.date, adults: int, children: int, rooms: int):
     return {"city": city, "start": start, "end": end, "adults": adults, "children": children, "rooms": rooms}
