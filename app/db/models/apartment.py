@@ -33,3 +33,14 @@ class ApartmentReservation(Base):
     to_date = Column(Date)
     created_at = Column(DateTime(), default=func.current_timestamp(), nullable=False)
     apartment_id = Column(Integer, ForeignKey('apartment.id'))
+
+
+class ApartmentReview(Base):
+    __tablename__ = "apartment_review"
+
+    id = Column(Integer, primary_key=True, index=True)
+    body = Column(String)
+    rating = Column(Float)
+    user_id = Column(Integer, ForeignKey('user.id'))
+    created_at = Column(DateTime(), default=func.current_timestamp(), nullable=False)
+    apartment_id = Column(Integer, ForeignKey('apartment.id'))
