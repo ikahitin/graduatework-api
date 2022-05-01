@@ -46,8 +46,13 @@ def get_apartments(db: Session, **kwargs):
          ApartmentReservation.to_date.between(kwargs["start"], kwargs["end"])))
 
     available_apartments = db.query(Apartment).filter(Apartment.id.not_in(booked_apartments))
+    query = available_apartments.filter(Apartment.city == kwargs["city"])
+    return query.all()
 
-    return available_apartments.all()
+
+def get_apartment_by_id(db: Session, apartment_id: int):
+    query = db.query(Apartment).filter(Apartment.id == apartment_id)
+    return query.first()
 
 
 async def add_apartment_images(db: Session, images: List[UploadFile], apartment_id: int):
