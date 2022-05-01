@@ -1,11 +1,24 @@
+import datetime
 from enum import Enum
 from typing import Optional, List
 
-from pydantic import HttpUrl, validator
+from pydantic import validator
 from pydantic.main import BaseModel
 
 from app.core.config import BASE_URL
+from app.schemas.auth import User
 from app.schemas.general import Coordinates
+
+
+class Review(BaseModel):
+    class Config:
+        orm_mode = True
+
+    id: int
+    body: str
+    rating: float
+    created_at: datetime.date
+    user: User
 
 
 class ApartmentTypeEnum(str, Enum):
@@ -43,6 +56,7 @@ class ApartmentCreate(ApartmentBase):
 class Apartment(ApartmentBase):
     id: int
     images: Optional[List[str]]
+    reviews: Optional[List[Review]]
 
     class Config:
         orm_mode = True

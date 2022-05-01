@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.api.utils import save_image
 from app.core.security.auth import get_password_hash
-from app.db.models.apartment import Apartment, ApartmentReservation
+from app.db.models.apartment import Apartment, ApartmentReservation, ApartmentReview
 from app.db.models.location import Location
 from app.db.models.user import User
 from app.schemas.auth import UserCreate

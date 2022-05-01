@@ -23,6 +23,7 @@ class Apartment(Base):
     distance_from_center = Column(Float)
     beds = Column(pg.JSONB)
     reservations = relationship("ApartmentReservation")
+    reviews = relationship("ApartmentReview")
 
 
 class ApartmentReservation(Base):
@@ -44,3 +45,4 @@ class ApartmentReview(Base):
     user_id = Column(Integer, ForeignKey('user.id'))
     created_at = Column(DateTime(), default=func.current_timestamp(), nullable=False)
     apartment_id = Column(Integer, ForeignKey('apartment.id'))
+    user = relationship("User")
