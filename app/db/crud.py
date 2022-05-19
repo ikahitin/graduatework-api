@@ -7,9 +7,11 @@ from sqlalchemy.orm import Session
 from app.api.utils import save_image
 from app.core.security.auth import get_password_hash
 from app.db.models.apartment import Apartment, ApartmentReservation, ApartmentReview
+from app.db.models.car import Car
 from app.db.models.location import Location
 from app.db.models.user import User
 from app.schemas.auth import UserCreate
+from app.schemas.car import CarCreate, CarCategoryEnum
 from app.schemas.location import LocationCreate
 
 
@@ -66,3 +68,27 @@ async def add_apartment_images(db: Session, images: List[UploadFile], apartment_
     db.commit()
     db.refresh(apartment)
     return apartment
+
+
+def get_cars(db: Session, categoryf: str):
+    query = db.query(Car).filter(Car.category == CarCategoryEnum[categoryf].value)
+    return query.all()
+
+
+def create_car(db: Session, car: CarCreate):
+    obj_in_data = jsonable_encoder(car)
+    db_car = Car(**obj_in_data)
+    db.add(db_car)
+    db.commit()
+    db.refresh(db_car)
+    return db_car
+
+
+async def add_car_image(db: Session, image: UploadFile, car_id: int):
+    filename = await save_image(image, f"car_images")
+    car = db.query(Car).filter(Car.id == car_id).first()
+    car.image_url = filename
+    db.add(car)
+    db.commit()
+    db.refresh(car)
+    return car
