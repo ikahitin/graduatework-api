@@ -90,5 +90,6 @@ class ApartmentReservationCreate(ApartmentReservationBase):
 
 class ApartmentReservation(ApartmentReservationBase):
     id: int
+    apartment: Apartment
     # user: User
     created_at: datetime.date

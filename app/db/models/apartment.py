@@ -39,6 +39,7 @@ class ApartmentReservation(Base):
     user_email = Column(String)
     created_at = Column(DateTime(), default=func.current_timestamp(), nullable=False)
     apartment_id = Column(Integer, ForeignKey('apartment.id'))
+    apartment = relationship("Apartment")
     # user = relationship("User")
 
 
