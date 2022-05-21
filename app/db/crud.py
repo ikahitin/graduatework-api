@@ -1,15 +1,17 @@
 from typing import List
 
-from fastapi import UploadFile
+from fastapi import UploadFile, HTTPException
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
+from starlette import status
 
 from app.api.utils import save_image
 from app.core.security.auth import get_password_hash
-from app.db.models.apartment import Apartment, ApartmentReservation, ApartmentReview
+from app.db.models.apartment import Apartment, ApartmentReservation
 from app.db.models.car import Car
 from app.db.models.location import Location
 from app.db.models.user import User
+from app.schemas.apartment import ApartmentReservationCreate
 from app.schemas.auth import UserCreate
 from app.schemas.car import CarCreate, CarCategoryEnum
 from app.schemas.location import LocationCreate
@@ -92,3 +94,24 @@ async def add_car_image(db: Session, image: UploadFile, car_id: int):
     db.commit()
     db.refresh(car)
     return car
+
+
+def check_if_apartment_available(db: Session, apartment_id, from_date, to_date):
+    booked_apartments = db.query(ApartmentReservation.apartment_id).filter(
+        (ApartmentReservation.from_date.between(from_date, to_date) |
+         ApartmentReservation.to_date.between(from_date, to_date)))
+
+    return db.query(Apartment).filter(Apartment.id.not_in(booked_apartments)).filter(Apartment.id == apartment_id).scalar() is not None
+
+
+def create_apartment_reservation(db: Session, apartment_id: int, reservation: ApartmentReservationCreate):
+    apartment_available = check_if_apartment_available(db, apartment_id, reservation.from_date, reservation.to_date)
+    if not apartment_available:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Apartment is not available in those dates")
+
+    obj_in_data = jsonable_encoder(reservation)
+    db_reservation = ApartmentReservation(**obj_in_data)
+    db.add(db_reservation)
+    db.commit()
+    db.refresh(db_reservation)
+    return db_reservation

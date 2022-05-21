@@ -2,7 +2,7 @@ import datetime
 from enum import Enum
 from typing import Optional, List
 
-from pydantic import validator
+from pydantic import validator, EmailStr
 from pydantic.main import BaseModel
 
 from app.core.config import BASE_URL
@@ -68,3 +68,27 @@ class Apartment(ApartmentBase):
             for img in v:
                 img_list.append(f"{BASE_URL}/static/apartment/{values['id']}/{img}")
             return img_list
+
+
+class ApartmentReservationBase(BaseModel):
+    class Config:
+        orm_mode = True
+
+    from_date: datetime.date
+    to_date: datetime.date
+    guest_name: str
+    guest_phone: str
+    comment: Optional[str]
+    arriving_hour: int
+    user_email: EmailStr
+    apartment_id: int
+
+
+class ApartmentReservationCreate(ApartmentReservationBase):
+    pass
+
+
+class ApartmentReservation(ApartmentReservationBase):
+    id: int
+    # user: User
+    created_at: datetime.date
