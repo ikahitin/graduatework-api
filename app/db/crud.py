@@ -1,3 +1,4 @@
+from datetime import date
 from typing import List
 
 from fastapi import UploadFile, HTTPException
@@ -115,3 +116,19 @@ def create_apartment_reservation(db: Session, apartment_id: int, reservation: Ap
     db.commit()
     db.refresh(db_reservation)
     return db_reservation
+
+
+def get_reservations(db: Session, current_user_email, reservation_status: str, reservation_type: str):
+    today = date.today()
+    query = db.query(ApartmentReservation)
+    if reservation_type == "apartment":
+        query = query.filter(ApartmentReservation.user_email == current_user_email)
+    if reservation_status == "planned":
+        query = query.filter((ApartmentReservation.from_date > today))
+    elif reservation_status == "active":
+        query = query.filter(
+            (ApartmentReservation.from_date.between(today, today) |
+             ApartmentReservation.to_date.between(today, today)))
+    return query.all()
+
+
