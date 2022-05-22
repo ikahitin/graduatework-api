@@ -55,6 +55,6 @@ class Car(CarBase):
     def validate_image_url(cls, v):
         if v:
             url = client.generate_presigned_url(ClientMethod='get_object',
-                                                Params={'Bucket': SPACE_BUCKET_NAME, 'Key': f'location_images/{v}'},
+                                                Params={'Bucket': SPACE_BUCKET_NAME, 'Key': f'car_images/{v}'},
                                                 ExpiresIn=3600)
             return url
