@@ -134,7 +134,7 @@ def get_reservations(db: Session, current_user_email, reservation_status: str, r
 
 def create_apartment(db: Session, apartment: ApartmentCreate):
     obj_in_data = jsonable_encoder(apartment)
-    apartment = ApartmentCreate(**obj_in_data)
+    apartment = Apartment(**obj_in_data)
     db.add(apartment)
     db.commit()
     db.refresh(apartment)
