@@ -5,7 +5,8 @@ from typing import Optional, List
 from pydantic import validator, EmailStr
 from pydantic.main import BaseModel
 
-from app.core.config import BASE_URL
+from app.boto3.client import client
+from app.core.config import SPACE_BUCKET_NAME
 from app.schemas.auth import User
 from app.schemas.general import Coordinates
 
@@ -66,7 +67,10 @@ class Apartment(ApartmentBase):
         if v:
             img_list = []
             for img in v:
-                img_list.append(f"{BASE_URL}/static/apartment/{values['id']}/{img}")
+                url = client.generate_presigned_url(ClientMethod="get_object",
+                                                    Params={"Bucket": SPACE_BUCKET_NAME, "Key": f"apartment/{values['id']}/{img}"},
+                                                    ExpiresIn=3600)
+                img_list.append(url)
             return img_list
 
 

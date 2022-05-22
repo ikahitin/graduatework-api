@@ -4,7 +4,8 @@ from typing import Optional
 from pydantic import HttpUrl, validator
 from pydantic.main import BaseModel
 
-from app.core.config import BASE_URL
+from app.boto3.client import client
+from app.core.config import SPACE_BUCKET_NAME
 
 
 class LocationTypeEnum(str, Enum):
@@ -33,4 +34,7 @@ class Location(LocationBase):
     @validator("image_url", pre=True, check_fields=False)
     def validate_image_url(cls, v):
         if v:
-            return f"{BASE_URL}/static/location_images/{v}"
+            url = client.generate_presigned_url(ClientMethod='get_object',
+                                                Params={'Bucket': SPACE_BUCKET_NAME, 'Key': f'location_images/{v}'},
+                                                ExpiresIn=3600)
+            return url
