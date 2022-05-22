@@ -40,5 +40,5 @@ async def save_image(file: UploadFile, img_folder: str):
     return file_name
 
 
-async def apartment_params(city: str, start: datetime.date, end: datetime.date, adults: int, children: int, rooms: int):
-    return {"city": city, "start": start, "end": end, "adults": adults, "children": children, "rooms": rooms}
+async def apartment_params(city: str, start: datetime.date, end: datetime.date, adults: int, children: int):
+    return {"city": city, "start": start, "end": end, "adults": adults, "children": children}

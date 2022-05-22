@@ -12,7 +12,7 @@ from app.db.models.apartment import Apartment, ApartmentReservation
 from app.db.models.car import Car
 from app.db.models.location import Location
 from app.db.models.user import User
-from app.schemas.apartment import ApartmentReservationCreate
+from app.schemas.apartment import ApartmentReservationCreate, ApartmentCreate
 from app.schemas.auth import UserCreate
 from app.schemas.car import CarCreate, CarCategoryEnum
 from app.schemas.location import LocationCreate
@@ -131,4 +131,12 @@ def get_reservations(db: Session, current_user_email, reservation_status: str, r
              ApartmentReservation.to_date.between(today, today)))
     return query.all()
 
+
+def create_apartment(db: Session, apartment: ApartmentCreate):
+    obj_in_data = jsonable_encoder(apartment)
+    apartment = ApartmentCreate(**obj_in_data)
+    db.add(apartment)
+    db.commit()
+    db.refresh(apartment)
+    return apartment
 

@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.api.utils import get_db, apartment_params
 from app.db import crud
-from app.schemas.apartment import Apartment, ApartmentReservationCreate, ApartmentReservation
+from app.schemas.apartment import Apartment, ApartmentReservationCreate, ApartmentReservation, ApartmentCreate
 
 router = APIRouter()
 
@@ -13,6 +13,11 @@ router = APIRouter()
 @router.get("", response_model=List[Apartment])
 async def get_apartments(db: Session = Depends(get_db), apartment_details: dict = Depends(apartment_params)):
     return crud.get_apartments(db=db, **apartment_details)
+
+
+@router.post("", response_model=Apartment)
+async def create_apartment(apartment: ApartmentCreate, db: Session = Depends(get_db)):
+    return crud.create_apartment(db, apartment)
 
 
 @router.get("/{apartment_id}", response_model=Apartment)
