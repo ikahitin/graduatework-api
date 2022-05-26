@@ -12,7 +12,9 @@ from app.db.models.user import User
 from app.db.models.location import Location
 from app.db.models.apartment import Apartment
 from app.db.models.apartment import ApartmentReview
+from app.db.models.apartment import ApartmentReservation
 from app.db.models.car import Car
+from app.db.models.car import CarReservation
 
 load_dotenv(dotenv_path=os.getenv("DOTENV_PATH"))
 

@@ -30,6 +30,12 @@ class ApartmentTypeEnum(str, Enum):
     resort_hotel = "resort_hotel"
 
 
+class AmenityTypeEnum(str, Enum):
+    free_parking = "Безкоштовна парковка"
+    room_service = "Обслуговування номерів"
+    free_wifi = "Безкоштовний WI-FI"
+
+
 class BedDescription(BaseModel):
     bed_description: str
     quantity: int

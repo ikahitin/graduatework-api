@@ -9,12 +9,12 @@ from starlette import status
 from app.api.utils import save_image
 from app.core.security.auth import get_password_hash
 from app.db.models.apartment import Apartment, ApartmentReservation
-from app.db.models.car import Car
+from app.db.models.car import Car, CarReservation
 from app.db.models.location import Location
 from app.db.models.user import User
 from app.schemas.apartment import ApartmentReservationCreate, ApartmentCreate
 from app.schemas.auth import UserCreate
-from app.schemas.car import CarCreate, CarCategoryEnum
+from app.schemas.car import CarCreate, CarCategoryEnum, CarReservationCreate
 from app.schemas.location import LocationCreate
 
 
@@ -57,6 +57,11 @@ def get_apartments(db: Session, **kwargs):
 
 def get_apartment_by_id(db: Session, apartment_id: int):
     query = db.query(Apartment).filter(Apartment.id == apartment_id)
+    return query.first()
+
+
+def get_car_by_id(db: Session, car_id: int):
+    query = db.query(Car).filter(Car.id == car_id)
     return query.first()
 
 
@@ -120,15 +125,18 @@ def create_apartment_reservation(db: Session, apartment_id: int, reservation: Ap
 
 def get_reservations(db: Session, current_user_email, reservation_status: str, reservation_type: str):
     today = date.today()
-    query = db.query(ApartmentReservation)
     if reservation_type == "apartment":
-        query = query.filter(ApartmentReservation.user_email == current_user_email)
+        model = ApartmentReservation
+    if reservation_type == "car":
+        model = CarReservation
+    query = db.query(model)
+    query = query.filter(model.user_email == current_user_email)
     if reservation_status == "planned":
-        query = query.filter((ApartmentReservation.from_date > today))
+        query = query.filter((model.from_date > today))
     elif reservation_status == "active":
         query = query.filter(
-            (ApartmentReservation.from_date.between(today, today) |
-             ApartmentReservation.to_date.between(today, today)))
+            (model.from_date.between(today, today) |
+             model.to_date.between(today, today)))
     return query.all()
 
 
@@ -140,3 +148,18 @@ def create_apartment(db: Session, apartment: ApartmentCreate):
     db.refresh(apartment)
     return apartment
 
+
+def create_car_reservation(db: Session, car_id: int, reservation: CarReservationCreate):
+    car = db.query(Car).get(car_id)
+    if car:
+        if not car.available:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Car is not available for booking")
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Car with id does not exist")
+
+    obj_in_data = jsonable_encoder(reservation)
+    db_reservation = CarReservation(**obj_in_data)
+    db.add(db_reservation)
+    db.commit()
+    db.refresh(db_reservation)
+    return db_reservation

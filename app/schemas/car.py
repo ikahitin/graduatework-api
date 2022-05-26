@@ -1,7 +1,8 @@
+import datetime
 from enum import Enum
-from typing import Optional
+from typing import Optional, List
 
-from pydantic import validator, HttpUrl
+from pydantic import validator, HttpUrl, EmailStr
 from pydantic.main import BaseModel
 
 from app.boto3.client import client
@@ -22,6 +23,16 @@ class CarTransmissionEnum(str, Enum):
     manual_transmission = "Механічна коробка передач"
 
 
+class Addition(BaseModel):
+    name: str
+    quantity: int
+    price: int
+
+
+class CarAddition(BaseModel):
+    additions: List[Addition]
+
+
 class CarInsurance(BaseModel):
     road_accident: bool
     theft: bool
@@ -39,6 +50,7 @@ class CarBase(BaseModel):
     price: int
     provider: str
     category: CarCategoryEnum
+    available: bool
 
 
 class CarCreate(CarBase):
@@ -50,6 +62,7 @@ class Car(CarBase):
 
     class Config:
         orm_mode = True
+        use_enum_values = True
 
     @validator("image_url", pre=True, check_fields=False)
     def validate_image_url(cls, v):
@@ -58,3 +71,26 @@ class Car(CarBase):
                                                 Params={'Bucket': SPACE_BUCKET_NAME, 'Key': f'car_images/{v}'},
                                                 ExpiresIn=3600)
             return url
+
+
+class CarReservationBase(BaseModel):
+    class Config:
+        orm_mode = True
+
+    from_date: datetime.datetime
+    to_date: datetime.datetime
+    user_name: str
+    user_phone: str
+    user_email: EmailStr
+    additions: Optional[CarAddition]
+    car_id: int
+
+
+class CarReservationCreate(CarReservationBase):
+    pass
+
+
+class CarReservation(CarReservationBase):
+    id: int
+    car: Car
+    created_at: datetime.date
