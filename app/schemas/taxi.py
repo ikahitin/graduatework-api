@@ -10,7 +10,7 @@ from app.core.config import SPACE_BUCKET_NAME
 
 
 class TaxiType(str, Enum):
-    standard = "Стандат"
+    standard = "Стандарт"
     upper_middle_class = "Вищий середній клас"
     minibus = "Мікроавтобус"
 
