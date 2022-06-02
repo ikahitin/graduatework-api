@@ -42,7 +42,6 @@ class TaxiCreate(TaxiBase):
 class Taxi(TaxiBase):
     id: int
     image_url: Optional[str]
-    price_for_ride: Any
 
     class Config:
         orm_mode = True
@@ -57,12 +56,18 @@ class Taxi(TaxiBase):
             return url
 
 
+class TaxiExtended(Taxi):
+    price_for_ride: int
+
+
 class TaxiReservationBase(BaseModel):
     class Config:
         orm_mode = True
 
     from_date: datetime.datetime
     to_date: datetime.datetime
+    start_address: str
+    end_address: str
     user_name: str
     user_phone: str
     user_email: EmailStr

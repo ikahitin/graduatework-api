@@ -25,6 +25,8 @@ class TaxiReservation(Base):
     id = Column(Integer, primary_key=True, index=True)
     from_date = Column(DateTime)
     to_date = Column(DateTime)
+    start_address = Column(String)
+    end_address = Column(String)
     appeal = Column(String)
     user_name = Column(String)
     user_phone = Column(String)

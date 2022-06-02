@@ -5,17 +5,17 @@ from sqlalchemy.orm import Session
 
 from app.api.utils import get_db, location_params
 from app.db import crud
-from app.schemas.taxi import Taxi, TaxiCreate, TaxiReservationCreate, TaxiReservation
+from app.schemas.taxi import Taxi, TaxiCreate, TaxiReservationCreate, TaxiReservation, TaxiExtended
 
 router = APIRouter()
 
 
-@router.get("", response_model=List[Taxi])
+@router.get("", response_model=List[TaxiExtended])
 async def get_taxi(db: Session = Depends(get_db), location_details: dict = Depends(location_params)):
     return crud.get_taxi(db, location_details)
 
 
-@router.get("/{taxi_id}", response_model=Taxi)
+@router.get("/{taxi_id}", response_model=TaxiExtended)
 async def get_taxi_by_type(taxi_id: int, db: Session = Depends(get_db),
                            location_details: dict = Depends(location_params)):
     return crud.get_taxi_by_type(db, taxi_id, location_details)
