@@ -22,7 +22,7 @@ class Apartment(Base):
     amenities = Column(pg.JSONB)
     distance_from_center = Column(Float)
     beds = Column(pg.JSONB)
-    reservations = relationship("ApartmentReservation")
+    # reservations = relationship("ApartmentReservation")
     reviews = relationship("ApartmentReview")
 
 

@@ -6,16 +6,18 @@ from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 from starlette import status
 
-from app.api.utils import save_image
+from app.api.utils import save_image, calc_price_in_taxi_query, add_price_obj
 from app.core.security.auth import get_password_hash
 from app.db.models.apartment import Apartment, ApartmentReservation
 from app.db.models.car import Car, CarReservation
 from app.db.models.location import Location
+from app.db.models.taxi import Taxi, TaxiReservation
 from app.db.models.user import User
 from app.schemas.apartment import ApartmentReservationCreate, ApartmentCreate
 from app.schemas.auth import UserCreate
 from app.schemas.car import CarCreate, CarCategoryEnum, CarReservationCreate
 from app.schemas.location import LocationCreate
+from app.schemas.taxi import TaxiCreate, TaxiReservationCreate
 
 
 def create_user(db: Session, user: UserCreate):
@@ -107,7 +109,8 @@ def check_if_apartment_available(db: Session, apartment_id, from_date, to_date):
         (ApartmentReservation.from_date.between(from_date, to_date) |
          ApartmentReservation.to_date.between(from_date, to_date)))
 
-    return db.query(Apartment).filter(Apartment.id.not_in(booked_apartments)).filter(Apartment.id == apartment_id).scalar() is not None
+    return db.query(Apartment).filter(Apartment.id.not_in(booked_apartments)).filter(
+        Apartment.id == apartment_id).scalar() is not None
 
 
 def create_apartment_reservation(db: Session, apartment_id: int, reservation: ApartmentReservationCreate):
@@ -127,8 +130,10 @@ def get_reservations(db: Session, current_user_email, reservation_status: str, r
     today = date.today()
     if reservation_type == "apartment":
         model = ApartmentReservation
-    if reservation_type == "car":
+    elif reservation_type == "car":
         model = CarReservation
+    elif reservation_type == "taxi":
+        model = TaxiReservation
     query = db.query(model)
     query = query.filter(model.user_email == current_user_email)
     if reservation_status == "planned":
@@ -159,6 +164,46 @@ def create_car_reservation(db: Session, car_id: int, reservation: CarReservation
 
     obj_in_data = jsonable_encoder(reservation)
     db_reservation = CarReservation(**obj_in_data)
+    db.add(db_reservation)
+    db.commit()
+    db.refresh(db_reservation)
+    return db_reservation
+
+
+def get_taxi(db: Session, location_details):
+    query = db.query(Taxi)
+    results = calc_price_in_taxi_query(query, location_details)
+    return results
+
+
+def get_taxi_by_type(db: Session, taxi_id: int, location_details):
+    query = db.query(Taxi).filter(Taxi.id == taxi_id)
+    obj = add_price_obj(query.first(), location_details)
+    return obj
+
+
+def create_taxi(db: Session, taxi: TaxiCreate):
+    obj_in_data = jsonable_encoder(taxi)
+    db_taxi = Taxi(**obj_in_data)
+    db.add(db_taxi)
+    db.commit()
+    db.refresh(db_taxi)
+    return db_taxi
+
+
+async def add_taxi_image(db: Session, image: UploadFile, taxi_id: int):
+    filename = await save_image(image, "taxi_images")
+    taxi = db.query(Taxi).filter(Taxi.id == taxi_id).first()
+    taxi.image_url = filename
+    db.add(taxi)
+    db.commit()
+    db.refresh(taxi)
+    return taxi
+
+
+def create_taxi_reservation(db: Session, taxi_type_id: int, reservation: TaxiReservationCreate):
+    obj_in_data = jsonable_encoder(reservation)
+    db_reservation = TaxiReservation(**obj_in_data)
     db.add(db_reservation)
     db.commit()
     db.refresh(db_reservation)
