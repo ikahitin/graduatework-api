@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from app.api.utils import get_db, apartment_params
 from app.db import crud
 from app.schemas.apartment import Apartment, ApartmentReservationCreate, ApartmentReservation, ApartmentCreate
+from app.db.models.apartment import Apartment as DBApartment
 
 router = APIRouter()
 
@@ -22,7 +23,7 @@ async def create_apartment(apartment: ApartmentCreate, db: Session = Depends(get
 
 @router.get("/{apartment_id}", response_model=Apartment)
 async def get_apartment_by_id(apartment_id: int, db: Session = Depends(get_db)):
-    apartment = crud.get_apartment_by_id(db, apartment_id)
+    apartment = crud.get_apartment_by_id(db, DBApartment, apartment_id)
     if not apartment:
         raise HTTPException(
             status_code=404,
@@ -34,7 +35,7 @@ async def get_apartment_by_id(apartment_id: int, db: Session = Depends(get_db)):
 
 @router.post("/{apartment_id}/images", response_model=Apartment)
 async def upload_apartment_images(apartment_id: int, images: List[UploadFile], db: Session = Depends(get_db)):
-    apartment = await crud.add_apartment_images(db, images, apartment_id)
+    apartment = await crud.add_apartment_images(db, "apartment", images, DBApartment, apartment_id)
     return apartment
 
 

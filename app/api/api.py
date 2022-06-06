@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from app.api.endpoints import auth, location, apartment, car, general, taxi
+from app.api.endpoints import auth, location, apartment, car, general, taxi, exchange_apartment
 
 api_router = APIRouter()
 
@@ -38,4 +38,10 @@ api_router.include_router(
     taxi.router,
     prefix="/taxi",
     tags=["taxi"],
+)
+
+api_router.include_router(
+    exchange_apartment.router,
+    prefix="/exchange_apartment",
+    tags=["exchange_apartment"],
 )

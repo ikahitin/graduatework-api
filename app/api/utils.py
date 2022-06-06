@@ -46,6 +46,12 @@ async def apartment_params(city: str, start: datetime.date, end: datetime.date, 
     return {"city": city, "start": start, "end": end, "adults": adults, "children": children}
 
 
+async def exchange_apartment_params(city: str, proposed_city: str, start: datetime.date, end: datetime.date,
+                                    adults: int, children: int):
+    return {"city": city, "proposed_city": proposed_city, "start": start, "end": end, "adults": adults,
+            "children": children}
+
+
 async def location_params(start_latitude: float, start_longitude: float, end_latitude: float, end_longitude: float):
     return {"start_latitude": start_latitude, "start_longitude": start_longitude, "end_latitude": end_latitude,
             "end_longitude": end_longitude}

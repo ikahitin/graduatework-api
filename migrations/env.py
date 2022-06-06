@@ -17,6 +17,7 @@ from app.db.models.car import Car
 from app.db.models.car import CarReservation
 from app.db.models.taxi import Taxi
 from app.db.models.taxi import TaxiReservation
+from app.db.models.exchange_apartment import ExchangeApartment
 
 load_dotenv(dotenv_path=os.getenv("DOTENV_PATH"))
 

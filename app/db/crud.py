@@ -3,6 +3,7 @@ from typing import List
 
 from fastapi import UploadFile, HTTPException
 from fastapi.encoders import jsonable_encoder
+from sqlalchemy import Integer
 from sqlalchemy.orm import Session
 from starlette import status
 
@@ -10,12 +11,15 @@ from app.api.utils import save_image, calc_price_in_taxi_query, add_price_obj
 from app.core.security.auth import get_password_hash
 from app.db.models.apartment import Apartment, ApartmentReservation
 from app.db.models.car import Car, CarReservation
+from app.db.models.exchange_apartment import ExchangeApartment
 from app.db.models.location import Location
 from app.db.models.taxi import Taxi, TaxiReservation
 from app.db.models.user import User
+from app.db.session import Base
 from app.schemas.apartment import ApartmentReservationCreate, ApartmentCreate
 from app.schemas.auth import UserCreate
 from app.schemas.car import CarCreate, CarCategoryEnum, CarReservationCreate
+from app.schemas.exchange_apartment import ExchangeApartmentCreate
 from app.schemas.location import LocationCreate
 from app.schemas.taxi import TaxiCreate, TaxiReservationCreate
 
@@ -57,8 +61,8 @@ def get_apartments(db: Session, **kwargs):
     return query.all()
 
 
-def get_apartment_by_id(db: Session, apartment_id: int):
-    query = db.query(Apartment).filter(Apartment.id == apartment_id)
+def get_apartment_by_id(db: Session, model: Base, apartment_id: int):
+    query = db.query(model).filter(model.id == apartment_id)
     return query.first()
 
 
@@ -67,12 +71,12 @@ def get_car_by_id(db: Session, car_id: int):
     return query.first()
 
 
-async def add_apartment_images(db: Session, images: List[UploadFile], apartment_id: int):
+async def add_apartment_images(db: Session, img_folder: str, images: List[UploadFile], model: Base, apartment_id: int):
     img_list = []
     for img in images:
-        filename = await save_image(img, f"apartment/{apartment_id}")
+        filename = await save_image(img, f"{img_folder}/{apartment_id}")
         img_list.append(filename)
-    apartment = db.query(Apartment).filter(Apartment.id == apartment_id).first()
+    apartment = db.query(model).filter(model.id == apartment_id).first()
     apartment.images = img_list
     db.add(apartment)
     db.commit()
@@ -208,3 +212,22 @@ def create_taxi_reservation(db: Session, taxi_type_id: int, reservation: TaxiRes
     db.commit()
     db.refresh(db_reservation)
     return db_reservation
+
+
+def get_exchange_apartments(db: Session, **kwargs):
+    query = db.query(ExchangeApartment) \
+        .filter(ExchangeApartment.city == kwargs.get("city")) \
+        .filter(
+        (ExchangeApartment.desired_city == kwargs.get("proposed_city")) | (ExchangeApartment.desired_city == None)) \
+        .filter(ExchangeApartment.people_quantity["adults"]["quantity"].cast(Integer) <= kwargs.get("adults")) \
+        .filter(ExchangeApartment.people_quantity["children"]["quantity"].cast(Integer) <= kwargs.get("children"))
+    return query.all()
+
+
+def create_exchange_apartment(db: Session, apartment: ExchangeApartmentCreate):
+    obj_in_data = jsonable_encoder(apartment)
+    apartment = ExchangeApartment(**obj_in_data)
+    db.add(apartment)
+    db.commit()
+    db.refresh(apartment)
+    return apartment
