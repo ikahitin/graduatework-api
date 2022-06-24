@@ -1,11 +1,13 @@
+import datetime
 from enum import Enum
 from typing import Optional, List
 
-from pydantic import validator
+from pydantic import validator, EmailStr
 from pydantic.main import BaseModel
 
 from app.boto3.client import client
 from app.core.config import SPACE_BUCKET_NAME
+from app.schemas.auth import User
 from app.schemas.general import Coordinates
 
 
@@ -61,6 +63,7 @@ class ExchangeApartmentCreate(ExchangeApartmentBase):
 class ExchangeApartment(ExchangeApartmentBase):
     id: int
     images: Optional[List[str]]
+    user: User
 
     class Config:
         orm_mode = True
@@ -75,3 +78,27 @@ class ExchangeApartment(ExchangeApartmentBase):
                                                     ExpiresIn=3600)
                 img_list.append(url)
             return img_list
+
+
+class ExchangeApartmentReservationBase(BaseModel):
+    class Config:
+        orm_mode = True
+
+    from_date: datetime.date
+    to_date: datetime.date
+    guest_name: str
+    guest_phone: str
+    user_email: EmailStr
+    apartment_id: int
+
+
+class ExchangeApartmentReservationCreate(ExchangeApartmentReservationBase):
+    pass
+
+
+class ExchangeApartmentReservation(ExchangeApartmentReservationBase):
+    id: int
+    status: str
+    apartment: ExchangeApartment
+    # user: User
+    created_at: datetime.date

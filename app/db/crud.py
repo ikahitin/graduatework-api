@@ -11,7 +11,7 @@ from app.api.utils import save_image, calc_price_in_taxi_query, add_price_obj
 from app.core.security.auth import get_password_hash
 from app.db.models.apartment import Apartment, ApartmentReservation
 from app.db.models.car import Car, CarReservation
-from app.db.models.exchange_apartment import ExchangeApartment
+from app.db.models.exchange_apartment import ExchangeApartment, ExchangeApartmentReservation
 from app.db.models.location import Location
 from app.db.models.taxi import Taxi, TaxiReservation
 from app.db.models.user import User
@@ -19,7 +19,7 @@ from app.db.session import Base
 from app.schemas.apartment import ApartmentReservationCreate, ApartmentCreate
 from app.schemas.auth import UserCreate
 from app.schemas.car import CarCreate, CarCategoryEnum, CarReservationCreate
-from app.schemas.exchange_apartment import ExchangeApartmentCreate
+from app.schemas.exchange_apartment import ExchangeApartmentCreate, ExchangeApartmentReservationCreate
 from app.schemas.location import LocationCreate
 from app.schemas.taxi import TaxiCreate, TaxiReservationCreate
 
@@ -224,10 +224,20 @@ def get_exchange_apartments(db: Session, **kwargs):
     return query.all()
 
 
-def create_exchange_apartment(db: Session, apartment: ExchangeApartmentCreate):
+def create_exchange_apartment(db: Session, apartment: ExchangeApartmentCreate, user_id: int):
     obj_in_data = jsonable_encoder(apartment)
     apartment = ExchangeApartment(**obj_in_data)
+    apartment.user_id = user_id
     db.add(apartment)
     db.commit()
     db.refresh(apartment)
     return apartment
+
+
+def create_exchange_apartment_reservation(db: Session, reservation: ExchangeApartmentReservationCreate):
+    obj_in_data = jsonable_encoder(reservation)
+    db_reservation = ExchangeApartmentReservation(**obj_in_data)
+    db.add(db_reservation)
+    db.commit()
+    db.refresh(db_reservation)
+    return db_reservation

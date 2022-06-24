@@ -10,14 +10,10 @@ from alembic import context
 from app.db.session import Base
 from app.db.models.user import User
 from app.db.models.location import Location
-from app.db.models.apartment import Apartment
-from app.db.models.apartment import ApartmentReview
-from app.db.models.apartment import ApartmentReservation
-from app.db.models.car import Car
-from app.db.models.car import CarReservation
-from app.db.models.taxi import Taxi
-from app.db.models.taxi import TaxiReservation
-from app.db.models.exchange_apartment import ExchangeApartment
+from app.db.models.apartment import Apartment, ApartmentReview, ApartmentReservation
+from app.db.models.car import Car, CarReservation
+from app.db.models.taxi import Taxi, TaxiReservation
+from app.db.models.exchange_apartment import ExchangeApartment, ExchangeApartmentReservation
 
 load_dotenv(dotenv_path=os.getenv("DOTENV_PATH"))
 
