@@ -3,7 +3,7 @@ from typing import List
 
 from fastapi import UploadFile, HTTPException
 from fastapi.encoders import jsonable_encoder
-from sqlalchemy import Integer
+from sqlalchemy import Integer, and_
 from sqlalchemy.orm import Session
 from starlette import status
 
@@ -143,9 +143,12 @@ def get_reservations(db: Session, current_user_email, reservation_status: str, r
     if reservation_status == "planned":
         query = query.filter((model.from_date > today))
     elif reservation_status == "active":
+        print(today)
+        # query = query.filter(
+        #     (model.from_date.between(today, today) |
+        #      model.to_date.between(today, today)))
         query = query.filter(
-            (model.from_date.between(today, today) |
-             model.to_date.between(today, today)))
+        and_(today <= model.to_date, today >= model.from_date))
     return query.all()
 
 
