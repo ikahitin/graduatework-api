@@ -1,6 +1,7 @@
 from enum import Enum
 
 from pydantic.main import BaseModel
+from pydantic.networks import EmailStr
 
 
 class Coordinates(BaseModel):
@@ -19,3 +20,7 @@ class ReservationTypeEnum(str, Enum):
     car = "car"
     taxi = "taxi"
     exchange_vacation = "exchange_vacation"
+
+
+class EmailSubscription(BaseModel):
+    email: EmailStr

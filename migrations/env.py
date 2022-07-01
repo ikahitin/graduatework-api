@@ -14,6 +14,7 @@ from app.db.models.apartment import Apartment, ApartmentReview, ApartmentReserva
 from app.db.models.car import Car, CarReservation
 from app.db.models.taxi import Taxi, TaxiReservation
 from app.db.models.exchange_apartment import ExchangeApartment, ExchangeApartmentReservation
+from app.db.models.location import EmailSubscription
 
 load_dotenv(dotenv_path=os.getenv("DOTENV_PATH"))
 

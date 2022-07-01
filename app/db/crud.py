@@ -12,6 +12,7 @@ from app.core.security.auth import get_password_hash
 from app.db.models.apartment import Apartment, ApartmentReservation
 from app.db.models.car import Car, CarReservation
 from app.db.models.exchange_apartment import ExchangeApartment, ExchangeApartmentReservation
+from app.db.models.location import EmailSubscription as EmailSubscriptionDB
 from app.db.models.location import Location
 from app.db.models.taxi import Taxi, TaxiReservation
 from app.db.models.user import User
@@ -20,6 +21,7 @@ from app.schemas.apartment import ApartmentReservationCreate, ApartmentCreate
 from app.schemas.auth import UserCreate
 from app.schemas.car import CarCreate, CarCategoryEnum, CarReservationCreate
 from app.schemas.exchange_apartment import ExchangeApartmentCreate, ExchangeApartmentReservationCreate
+from app.schemas.general import EmailSubscription
 from app.schemas.location import LocationCreate
 from app.schemas.taxi import TaxiCreate, TaxiReservationCreate
 
@@ -244,3 +246,12 @@ def create_exchange_apartment_reservation(db: Session, reservation: ExchangeApar
     db.commit()
     db.refresh(db_reservation)
     return db_reservation
+
+
+def add_email(db: Session, email_body: EmailSubscription):
+    obj_in_data = jsonable_encoder(email_body)
+    email = EmailSubscriptionDB(**obj_in_data)
+    db.add(email)
+    db.commit()
+    db.refresh(email)
+    return True
